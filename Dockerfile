@@ -59,10 +59,14 @@ ENV PATH="$PATH:/opt/mssql-tools18/bin"
 RUN sed -i 's/Listen 80/Listen 460/g' /etc/apache2/ports.conf \
     && sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:460>/g' /etc/apache2/sites-available/000-default.conf
 
-# Copiar el script de inicio al contenedor
+# 1. Activar módulos de Apache para SSL
+RUN a2enmod ssl headers
+
+# 2. Copiar el script de inicio al contenedor
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
+# Exponemos el puerto interno fijo del contenedor (Apache siempre escuchará internamente en el 460)
 EXPOSE 460
 
 # Ejecutar el script al iniciar el contenedor
