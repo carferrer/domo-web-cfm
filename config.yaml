@@ -9,9 +9,7 @@ arch:
   - aarch64
   - amd64
 ports:
-  460/tcp: 460
-ports_description:
-  460/tcp: Web interface
+  80/tcp: 460
 map:
   - "config:rw"
   - "ssl:ro"
