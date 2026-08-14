@@ -2,6 +2,7 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ACCEPT_EULA=Y
+ARG BUILD_VERSION=latest
 LABEL io.hass.version="$BUILD_VERSION" io.hass.type="addon" io.hass.arch="aarch64|amd64"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
