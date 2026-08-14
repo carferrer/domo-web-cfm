@@ -1,0 +1,17 @@
+name: "Domo WEB"
+version: "2026.08.01"
+slug: "domo-web-cfm"
+description: "Apache con soporte para MSSQL"
+url: "https://github.com/carferrer/domo-web-cfm"
+#image: "ghcr.io/carferrer/domo-web-cfm"
+#image_tag: "latest"
+arch:
+  - aarch64
+  - amd64
+ports:
+  460/tcp: 460
+ports_description:
+  460/tcp: Web interface
+map:
+  - "config:rw"
+  - "ssl:ro"
