@@ -56,8 +56,8 @@ RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unix
 ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
 # Cambiar el puerto por defecto de Apache al 460
-RUN sed -i 's/Listen 80/Listen 460/g' /etc/apache2/ports.conf \
-    && sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:460>/g' /etc/apache2/sites-available/000-default.conf
+#RUN sed -i 's/Listen 80/Listen 460/g' /etc/apache2/ports.conf \
+#    && sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:460>/g' /etc/apache2/sites-available/000-default.conf
 
 # 1. Activar módulos de Apache para SSL
 RUN a2enmod ssl headers
