@@ -8,8 +8,6 @@ url: "https://github.com/carferrer/domo-web-cfm"
 arch:
   - aarch64
   - amd64
-ports:
-  460/tcp: 460
 map:
   - "addon_config:rw"
   - "ssl:ro"
@@ -23,4 +21,6 @@ options:
   puerto: 460
   ssl_cert: "fullchain.pem"
   ssl_key: "privkey.pem"
-
+# 3. Vincular el puerto interno al puerto dinámico de la interfaz 👇
+ports:
+  460/tcp: puerto
