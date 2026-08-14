@@ -41,6 +41,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
-EXPOSE 470
+EXPOSE 460
 
 CMD ["apachectl", "-D", "FOREGROUND"]
