@@ -8,8 +8,8 @@ CERT_NAME=${SSL_CERT:-fullchain.pem}
 KEY_NAME=${SSL_KEY:-privkey.pem}
 
 echo "Configurando Apache para usar el puerto interno: 460 (Mapeado externamente al: $HTTP_PORT)"
-echo "Buscando certificado: /ssl/$CERT_NAME"
-echo "Buscando llave privada: /ssl/$KEY_NAME"
+echo "Buscando certificado: $CERT_NAME"
+echo "Buscando llave privada: $KEY_NAME"
 
 # 2. Vincular directorio de desarrollo PHP en /share
 SHARE_DIR="/config"
