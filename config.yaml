@@ -1,5 +1,5 @@
 name: "Domo WEB"
-version: "2026.08.02"
+version: "2026.08.03"
 slug: "domo-web-cfm"
 description: "Apache con soporte para MSSQL"
 url: "https://github.com/carferrer/domo-web-cfm"
