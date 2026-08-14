@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-# 1. Declarar el argumento para eliminar el warning "UndefinedVar"
+# Declarar el argumento para eliminar el warning "UndefinedVar"
 ARG BUILD_VERSION=local
 
 # Etiquetas solicitadas para Home Assistant
@@ -11,7 +11,7 @@ LABEL io.hass.version="${BUILD_VERSION}" \
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ACCEPT_EULA=Y
 
-# 2. Instalación corregida y con URL de repositorio limpia
+# Instalación optimizada y corregida para Ubuntu 24.04 Noble
 RUN apt-get update && apt-get install -y --no-install-recommends \
     apache2 \
     curl \
@@ -27,8 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     php8.3-curl \
     php-pear \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
-    && UBUNTU_VERSION=$(lsb_release -rs) \
-    && echo "deb [signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://microsoft.com{UBUNTU_VERSION}/prod noble main" > /etc/apt/sources.list.d/mssql-release.list \
+    && echo "deb [signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update && apt-get install -y --no-install-recommends \
     msodbcsql18 \
     mssql-tools18 \
