@@ -1,5 +1,5 @@
 name: "Domo WEB"
-version: "2026.08.05"
+version: "2026.08.06"
 slug: "domo-web-cfm"
 description: "Apache con soporte para MSSQL"
 url: "https://github.com/carferrer/domo-web-cfm"
@@ -13,3 +13,14 @@ ports:
 map:
   - "addon_config:rw"
   - "ssl:ro"
+# 1. Definir las variables que se verán en la interfaz 👇
+schema:
+  puerto: port
+  ssl_cert: str
+  ssl_key: str
+# 2. Asignar valores por defecto 👇
+options:
+  puerto: 460
+  ssl_cert: "fullchain.pem"
+  ssl_key: "privkey.pem"
+
