@@ -11,5 +11,5 @@ arch:
 ports:
   80/tcp: 460
 map:
-  - "config:rw"
+  - "addon_config:rw"
   - "ssl:ro"
