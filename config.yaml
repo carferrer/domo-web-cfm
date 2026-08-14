@@ -9,7 +9,7 @@ arch:
   - aarch64
   - amd64
 ports:
-  80/tcp: 460
+  460/tcp: 460
 map:
   - "addon_config:rw"
   - "ssl:ro"
