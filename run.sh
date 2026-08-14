@@ -21,8 +21,8 @@ fi
 rm -rf /var/www/html
 ln -s "$SHARE_DIR" /var/www/html
 
-# 3. Forzar a Apache a escuchar internamente SIEMPRE en el puerto 460
-sed -i 's/Listen.*/Listen 460/g' /etc/apache2/ports.conf
+# 3. Reescribir el archivo ports.conf desde cero para evitar duplicados 👇
+echo "Listen 460" > /etc/apache2/ports.conf
 
 # 4. Comprobar certificados SSL personalizados de Home Assistant
 CERT_FILE="$CERT_NAME"
@@ -40,7 +40,7 @@ else
         -subj "/C=ES/ST=Local/L=HomeAssistant/O=ApacheAddon/CN=localhost"
 fi
 
-# 5. Generar VirtualHost (Usamos 'EOF' con comillas para evitar fallos de sintaxis con los paréntesis de Apache) 👇
+# 5. Generar VirtualHost apuntando estrictamente al puerto 460 interno
 cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:460>
     ServerAdmin webmaster@localhost
