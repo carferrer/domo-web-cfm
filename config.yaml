@@ -1,5 +1,5 @@
 name: "Domo WEB"
-version: "2026.08.10"
+version: "2026.08.11"
 slug: "domo-web-cfm"
 description: "Apache con soporte para MSSQL"
 url: "https://github.com/carferrer/domo-web-cfm"
@@ -13,12 +13,12 @@ map:
   - "ssl:ro"
 schema:
   puerto: port
-  ssl_cert: str
-  ssl_key: str
+  ssl_cert: "str?"
+  ssl_key: "str?"
 options:
   puerto: 460
-  ssl_cert: "fullchain.pem"
-  ssl_key: "privkey.pem"
+  ssl_cert: null
+  ssl_key: null
 ports:
   460/tcp: 460  # Indica el puerto interno fijo del contenedor
 ports_description:
