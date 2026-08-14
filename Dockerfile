@@ -55,6 +55,6 @@ RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unix
 # Configurar ruta de ejecución de las herramientas SQL de Microsoft
 ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
-EXPOSE 460
+EXPOSE 80
 
 CMD ["apachectl", "-D", "FOREGROUND"]
