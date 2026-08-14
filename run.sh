@@ -1,24 +1,67 @@
 #!/bin/bash
 
-echo "Iniciando configuración del Add-on..."
+echo "Iniciando configuración dinámica del Add-on..."
 
-# 1. Definir la ruta en /share donde pondrás tus archivos PHP
+# 1. Leer las variables de Home Assistant (si vienen vacías, asigna un backup)
+HTTP_PORT=${PUERTO:-460}
+CERT_NAME=${SSL_CERT:-fullchain.pem}
+KEY_NAME=${SSL_KEY:-privkey.pem}
+
+echo "Configurando Apache para usar el puerto interno: 460 (Mapeado externamente al: $HTTP_PORT)"
+echo "Buscando certificado: /ssl/$CERT_NAME"
+echo "Buscando llave privada: /ssl/$KEY_NAME"
+
+# 2. Vincular directorio de desarrollo PHP en /share
 SHARE_DIR="/config"
-
-# 2. Si la carpeta no existe en /share, la creamos y añadimos un index.php de prueba
 if [ ! -d "$SHARE_DIR" ]; then
     echo "Creando la carpeta del proyecto en /config..."
     mkdir -p "$SHARE_DIR"
     echo "<?php phpinfo(); ?>" > "$SHARE_DIR/index.php"
 fi
-
-# 3. Limpiar el directorio por defecto de Apache
 rm -rf /var/www/html
-
-# 4. Crear un enlace simbólico para que Apache apunte directamente a /share
 ln -s "$SHARE_DIR" /var/www/html
 
-echo "Enlaces configurados. Iniciando Apache en el puerto 460..."
+# 3. Forzar a Apache a escuchar internamente SIEMPRE en el puerto 460
+# (Home Assistant se encarga de redirigir el tráfico desde tu puerto personalizado hacia este 460 interno)
+sed -i 's/Listen.*/Listen 460/g' /etc/apache2/ports.conf
 
-# 5. Ejecutar Apache en primer plano (reemplaza el CMD del Dockerfile)
+# 4. Comprobar certificados SSL personalizados de Home Assistant
+CERT_FILE="$CERT_NAME"
+KEY_FILE=""$KEY_NAME"
+
+if [ -f "$CERT_FILE" ] && [ -f "$KEY_FILE" ]; then
+    echo "Certificados personalizados encontrados y validados."
+else
+    echo "No se encontraron los certificados especificados. Creando certificados de prueba..."
+    mkdir -p /etc/apache2/ssl
+    CERT_FILE="/etc/apache2/ssl/server.crt"
+    KEY_FILE="/etc/apache2/ssl/server.key"
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout "$KEY_FILE" -out "$CERT_FILE" \
+        -subj "/C=ES/ST=Local/L=HomeAssistant/O=ApacheAddon/CN=localhost"
+fi
+
+# 5. Generar VirtualHost apuntando internamente al puerto 460 con los certificados elegidos
+cat <<EOF > /etc/apache2/sites-available/000-default.conf
+<VirtualHost *:460>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+
+    SSLEngine on
+    SSLCertificateFile $CERT_FILE
+    SSLCertificateKeyFile $KEY_FILE
+
+    <FilesMatch "\.(cgi|shtml|phtml|php)$">
+        SSLOptions +StdEnvVars
+    </FilesMatch>
+    <Directory /usr/lib/cgi-bin>
+        SSLOptions +StdEnvVars
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+EOF
+
+echo "Iniciando Apache de forma segura..."
 exec apachectl -D FOREGROUND
