@@ -3,11 +3,11 @@
 echo "Iniciando configuración del Add-on..."
 
 # 1. Definir la ruta en /share donde pondrás tus archivos PHP
-SHARE_DIR="/addon_config/mi_proyecto_php"
+SHARE_DIR="/config"
 
 # 2. Si la carpeta no existe en /share, la creamos y añadimos un index.php de prueba
 if [ ! -d "$SHARE_DIR" ]; then
-    echo "Creando la carpeta del proyecto en /addon_config/mi_proyecto_php..."
+    echo "Creando la carpeta del proyecto en /config..."
     mkdir -p "$SHARE_DIR"
     echo "<?php phpinfo(); ?>" > "$SHARE_DIR/index.php"
 fi
