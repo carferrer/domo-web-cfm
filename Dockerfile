@@ -55,6 +55,15 @@ RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unix
 # Configurar ruta de ejecución de las herramientas SQL de Microsoft
 ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
-EXPOSE 80
+# Cambiar el puerto por defecto de Apache al 460
+RUN sed -i 's/Listen 80/Listen 460/g' /etc/apache2/ports.conf \
+    && sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:460>/g' /etc/apache2/sites-available/000-default.conf
 
-CMD ["apachectl", "-D", "FOREGROUND"]
+# Copiar el script de inicio al contenedor
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
+
+EXPOSE 460
+
+# Ejecutar el script al iniciar el contenedor
+CMD [ "/run.sh" ]
