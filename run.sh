@@ -22,12 +22,11 @@ rm -rf /var/www/html
 ln -s "$SHARE_DIR" /var/www/html
 
 # 3. Forzar a Apache a escuchar internamente SIEMPRE en el puerto 460
-# (Home Assistant se encarga de redirigir el tráfico desde tu puerto personalizado hacia este 460 interno)
 sed -i 's/Listen.*/Listen 460/g' /etc/apache2/ports.conf
 
 # 4. Comprobar certificados SSL personalizados de Home Assistant
 CERT_FILE="$CERT_NAME"
-KEY_FILE=""$KEY_NAME"
+KEY_FILE="$KEY_NAME"
 
 if [ -f "$CERT_FILE" ] && [ -f "$KEY_FILE" ]; then
     echo "Certificados personalizados encontrados y validados."
@@ -41,15 +40,15 @@ else
         -subj "/C=ES/ST=Local/L=HomeAssistant/O=ApacheAddon/CN=localhost"
 fi
 
-# 5. Generar VirtualHost apuntando internamente al puerto 460 con los certificados elegidos
-cat <<EOF > /etc/apache2/sites-available/000-default.conf
+# 5. Generar VirtualHost (Usamos 'EOF' con comillas para evitar fallos de sintaxis con los paréntesis de Apache) 👇
+cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:460>
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html
 
     SSLEngine on
-    SSLCertificateFile $CERT_FILE
-    SSLCertificateKeyFile $KEY_FILE
+    SSLCertificateFile /etc/apache2/ssl/server.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/server.key
 
     <FilesMatch "\.(cgi|shtml|phtml|php)$">
         SSLOptions +StdEnvVars
@@ -58,10 +57,14 @@ cat <<EOF > /etc/apache2/sites-available/000-default.conf
         SSLOptions +StdEnvVars
     </Directory>
 
-    ErrorLog \${APACHE_LOG_DIR}/error.log
-    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 EOF
+
+# 6. Reemplazar las rutas de los certificados de forma segura dentro del archivo final
+sed -i "s|/etc/apache2/ssl/server.crt|$CERT_FILE|g" /etc/apache2/sites-available/000-default.conf
+sed -i "s|/etc/apache2/ssl/server.key|$KEY_FILE|g" /etc/apache2/sites-available/000-default.conf
 
 echo "Iniciando Apache de forma segura..."
 exec apachectl -D FOREGROUND
