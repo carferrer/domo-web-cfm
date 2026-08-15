@@ -1,5 +1,5 @@
 name: "Domo WEB"
-version: "2026.08.15"
+version: "2026.08.16"
 slug: "domo-web-cfm"
 description: "Apache con soporte para MSSQL"
 url: "https://github.com/carferrer/domo-web-cfm"
@@ -13,7 +13,6 @@ map:
   - "ssl:ro"
 schema:
   url: "str?"
-  puerto: port
   ssl_cert: "str?"
   ssl_key: "str?"
 options:
