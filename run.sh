@@ -63,7 +63,7 @@ cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
 			Require all granted
 	</Directory>
 
-    CustomLog "|/usr/bin/rotatelogs /var/www/html/logs/access_log.%Y-%m-%d 86400 30" combined
+	CustomLog "|/usr/bin/rotatelogs -f /var/www/html/logs/access_log.%Y-%m-%d 86400 30 15" combined
 
     SSLEngine on
     SSLCertificateFile /etc/apache2/ssl/server.crt
