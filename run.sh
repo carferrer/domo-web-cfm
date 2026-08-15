@@ -9,7 +9,6 @@ KEY_NAME=${SSL_KEY:-privkey.pem}
 
 
 VALOR_INTERFAZ=$(bashio::config 'puerto')
-
 echo "El usuario configuró el valor: $VALOR_INTERFAZ"
 
 echo "Configurando Apache para usar el puerto interno: 460 (Mapeado externamente al: $HTTP_PORT)"
