@@ -20,7 +20,7 @@ echo "Configurando Apache para usar el puerto interno: 460 (Mapeado externamente
 echo "Buscando certificado: $CERT_NAME"
 echo "Buscando llave privada: $KEY_NAME"
 
-# 2. Vincular directorio de desarrollo PHP en /config
+# 2. Vincular directorio de desarrollo PHP en /config. Dentro de HA en app_config
 SHARE_DIR="/config"
 if [ ! -d "$SHARE_DIR" ]; then
     echo "Creando la carpeta del proyecto en /config..."
