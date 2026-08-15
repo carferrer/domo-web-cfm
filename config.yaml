@@ -18,7 +18,7 @@ schema:
   ssl_key: "str?"
 options:
   url: null
-  #puerto: 460
+  puerto: 460
   ssl_cert: null
   ssl_key: null
 ports:
