@@ -52,6 +52,9 @@ RUN pecl install sqlsrv pdo_sqlsrv \
 RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unixodbc-dev \
     && apt-get clean
 
+#fichero que genera homeassistatn con los parametros que metemos en la UI del addon
+ENV OPTIONS_FILE=/data/options.json
+
 # Configurar ruta de ejecución de las herramientas SQL de Microsoft
 ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
