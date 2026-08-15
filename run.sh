@@ -3,9 +3,11 @@
 echo "Iniciando configuración dinámica del Add-on..."
 
 # 1. Leer las variables de Home Assistant (si vienen vacías, asigna un backup)
+#PUERTO hace referencia el puerto que mapea HA ya que el del docker dejo siempre 460
 PUERTO=$(jq --raw-output '.puerto' $OPTIONS_FILE)
 SSL_CERT=$(jq --raw-output '.ssl_cert' $OPTIONS_FILE)
 SSL_KEY=$(jq --raw-output '.ssl_key' $OPTIONS_FILE)
+URL=$(jq --raw-output '.url' $OPTIONS_FILE)
 
 
 HTTP_PORT=${PUERTO:-460}
@@ -53,7 +55,7 @@ fi
 cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:460>
     DocumentRoot /var/www/html/html
-    ServerName domo-web.servidorpropio.com:460
+    ServerName server.server.com:460
     PHPINIDir /var/www/html/conf
     <Directory "/var/www/html/html">
 			Options FollowSymLinks
@@ -73,6 +75,7 @@ EOF
 # 6. Reemplazar las rutas de los certificados de forma segura dentro del archivo final
 sed -i "s|/etc/apache2/ssl/server.crt|$CERT_FILE|g" /etc/apache2/sites-available/000-default.conf
 sed -i "s|/etc/apache2/ssl/server.key|$KEY_FILE|g" /etc/apache2/sites-available/000-default.conf
+sed -i "s|server.server.com:460|$URL|g" /etc/apache2/sites-available/000-default.conf
 
 echo "Iniciando Apache de forma segura..."
 exec apachectl -D FOREGROUND
