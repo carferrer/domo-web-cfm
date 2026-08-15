@@ -52,6 +52,9 @@ RUN pecl install sqlsrv pdo_sqlsrv \
 RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unixodbc-dev \
     && apt-get clean
 
+#instala jq para poder leer el fichero options de parametros desde HA
+RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
+
 #fichero que genera homeassistatn con los parametros que metemos en la UI del addon
 ENV OPTIONS_FILE=/data/options.json
 
