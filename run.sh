@@ -4,10 +4,12 @@ echo "Iniciando configuración dinámica del Add-on..."
 
 # 1. Leer las variables de Home Assistant (si vienen vacías, asigna un backup)
 #PUERTO hace referencia el puerto que mapea HA ya que el del docker dejo siempre 460
-PUERTO=$(jq --raw-output '.puerto' $OPTIONS_FILE)
+#$OPTIONS_FILE se declara en el dockerfile
 SSL_CERT=$(jq --raw-output '.ssl_cert' $OPTIONS_FILE)
 SSL_KEY=$(jq --raw-output '.ssl_key' $OPTIONS_FILE)
 URL=$(jq --raw-output '.url' $OPTIONS_FILE)
+#he istalado los bachio de HA en esta imagen y ahora puedo leer los parametros de otra manera
+PUERTO=$(bashio::addon.port "460/tcp")
 
 
 HTTP_PORT=${PUERTO:-460}
