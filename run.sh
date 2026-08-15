@@ -8,19 +8,13 @@ echo "Iniciando configuración dinámica del Add-on..."
 SSL_CERT=$(jq --raw-output '.ssl_cert' $OPTIONS_FILE)
 SSL_KEY=$(jq --raw-output '.ssl_key' $OPTIONS_FILE)
 URL=$(jq --raw-output '.url' $OPTIONS_FILE)
-#he istalado los bachio de HA en esta imagen y ahora puedo leer los parametros de otra manera
-PUERTO=$(bashio::addon.port "460/tcp")
 
 
-HTTP_PORT=${PUERTO:-460}
 CERT_NAME=${SSL_CERT:-fullchain.pem}
 KEY_NAME=${SSL_KEY:-privkey.pem}
 
 
-
-echo "El usuario configuró el valor: $VALOR_INTERFAZ"
-
-echo "Configurando Apache para usar el puerto interno: 460 (Mapeado externamente al: $HTTP_PORT)"
+echo "Configurando Apache para usar el puerto interno: 460. Si ha ha mapeado ver UI del addon el HA"
 echo "Buscando certificado: $CERT_NAME"
 echo "Buscando llave privada: $KEY_NAME"
 
