@@ -52,7 +52,7 @@ RUN pecl install sqlsrv pdo_sqlsrv \
 RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unixodbc-dev \
     && apt-get clean
 
-#instala jq para poder leer el fichero options de parametros desde HA
+#instala jq para poder leer el fichero OPTIONS_FILE de parametros desde HA
 RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
 
 #fichero que genera homeassistatn con los parametros que metemos en la UI del addon
@@ -60,10 +60,6 @@ ENV OPTIONS_FILE=/data/options.json
 
 # Configurar ruta de ejecución de las herramientas SQL de Microsoft
 ENV PATH="$PATH:/opt/mssql-tools18/bin"
-
-# Cambiar el puerto por defecto de Apache al 460
-#RUN sed -i 's/Listen 80/Listen 460/g' /etc/apache2/ports.conf \
-#    && sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:460>/g' /etc/apache2/sites-available/000-default.conf
 
 # 1. Activar módulos de Apache para SSL
 RUN a2enmod ssl headers
