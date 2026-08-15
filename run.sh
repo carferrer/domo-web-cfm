@@ -3,9 +3,14 @@
 echo "Iniciando configuración dinámica del Add-on..."
 
 # 1. Leer las variables de Home Assistant (si vienen vacías, asigna un backup)
-HTTP_PORT=${PUERTO:-460}
+HTTP_PORT=${puerto:-460}
 CERT_NAME=${SSL_CERT:-fullchain.pem}
 KEY_NAME=${SSL_KEY:-privkey.pem}
+
+
+VALOR_INTERFAZ=$(bashio::config 'puerto')
+
+echo "El usuario configuró el valor: $VALOR_INTERFAZ"
 
 echo "Configurando Apache para usar el puerto interno: 460 (Mapeado externamente al: $HTTP_PORT)"
 echo "Buscando certificado: $CERT_NAME"
