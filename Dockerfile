@@ -12,15 +12,6 @@ LABEL io.hass.version="${BUILD_VERSION}" \
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ACCEPT_EULA=Y
 
-# bashio para interactuar mejor con los parametros que recibe desde la configuración de addon
-ARG BASHIO_REPOSITORY=hassio-addons/bashio
-ARG BASHIO_VERSION=0.17.5
-ADD --unpack=true "https://github.com/${BASHIO_REPOSITORY}/archive/v${BASHIO_VERSION}.tar.gz" /usr/src/bashio
-WORKDIR /usr/src/bashio
-RUN \
-    mv /usr/src/bashio/bashio-*/lib /usr/lib/bashio \
-    && ln -s /usr/lib/bashio/bashio /usr/bin/bashio \
-    && rm -rf /usr/src/bashio
 
 # PASO 1: Instalar dependencias base del sistema y PHP 8.3
 RUN apt-get update && apt-get install -y --no-install-recommends \
