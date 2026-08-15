@@ -52,22 +52,21 @@ fi
 # 5. Generar VirtualHost apuntando estrictamente al puerto 460 interno
 cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:460>
-    ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/html
+    DocumentRoot /var/www/html/html
+    ServerName domo-web.servidorpropio.com:460
+    PHPINIDir /var/www/html/conf
+    <Directory "/var/www/html/html">
+			Options FollowSymLinks
+			AllowOverride All
+			Require all granted
+	</Directory>
+
+    CustomLog "|/usr/bin/rotatelogs /var/www/html/logs/access_log.%Y-%m-%d 86400 30" combined
 
     SSLEngine on
     SSLCertificateFile /etc/apache2/ssl/server.crt
     SSLCertificateKeyFile /etc/apache2/ssl/server.key
-
-    <FilesMatch "\.(cgi|shtml|phtml|php)$">
-        SSLOptions +StdEnvVars
-    </FilesMatch>
-    <Directory /usr/lib/cgi-bin>
-        SSLOptions +StdEnvVars
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    
 </VirtualHost>
 EOF
 
