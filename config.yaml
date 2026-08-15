@@ -12,10 +12,12 @@ map:
   - "addon_config:rw"
   - "ssl:ro"
 schema:
+  url: "str?"
   puerto: port
   ssl_cert: "str?"
   ssl_key: "str?"
 options:
+  url: null
   puerto: 460
   ssl_cert: null
   ssl_key: null
