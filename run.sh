@@ -10,8 +10,8 @@ SSL_KEY=$(jq --raw-output '.ssl_key' $OPTIONS_FILE)
 URL=$(jq --raw-output '.url' $OPTIONS_FILE)
 
 # --- NUEVO: Leer el nivel de log seleccionado en la interfaz de Home Assistant ---
-HA_LOG_LEVEL=$(jq --raw-output '.logger.default // "warning"' $OPTIONS_FILE)
-echo "Nivel de log detectado de Home Assistant: $HA_LOG_LEVEL"
+HA_LOG_LEVEL=$(jq --raw-output '.log_level // "warning"' $OPTIONS_FILE)
+echo "Nivel de log detectado desde la UI de Home Assistant: $HA_LOG_LEVEL"
 
 # Mapear niveles de Home Assistant al formato estricto de Apache
 APACHE_LOG_LEVEL="warn"
