@@ -3,7 +3,8 @@ name: Build
 on:
   release:
     types: [published]
-    
+
+  #la ejecución manuak no tiene sentido porque no inyecta el tag de la verion
   workflow_dispatch:
     inputs:
         motivo:
