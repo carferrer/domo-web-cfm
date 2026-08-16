@@ -1,3 +1,7 @@
+# Versión 2026.08.33 (2026-08-16)
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.08.32...2026.08.33
+
 # Versión 2026.08.32 (2026-08-16)
 
 **Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.08.31...2026.08.32
