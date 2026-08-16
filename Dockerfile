@@ -12,10 +12,10 @@ LABEL io.hass.version="${BUILD_VERSION}" \
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ACCEPT_EULA=Y
 
-
-# PASO 1: Instalar dependencias base del sistema y PHP 8.3
+# PASO 1: Instalar dependencias base del sistema, coreutils y PHP 8.3
 RUN apt-get update && apt-get install -y --no-install-recommends \
     apache2 \
+    coreutils \
     curl \
     gnupg \
     ca-certificates \
@@ -33,8 +33,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # PASO 2: Registrar las llaves y el repositorio oficial de Microsoft para Ubuntu 24.04
-RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" > /etc/apt/sources.list.d/mssql-release.list
+RUN curl -fsSL https://microsoft.com | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://microsoft.com noble main" > /etc/apt/sources.list.d/mssql-release.list
 
 # PASO 3: Pre-aceptar la licencia EULA en la base de datos interna de APT (Esto soluciona el Exit Code 100)
 RUN apt-get update \
@@ -53,10 +53,10 @@ RUN pecl install sqlsrv pdo_sqlsrv \
 RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unixodbc-dev \
     && apt-get clean
 
-#instala jq para poder leer el fichero OPTIONS_FILE de parametros desde HA
+# Instala jq para poder leer el fichero OPTIONS_FILE de parametros desde HA
 RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
 
-#fichero que genera homeassistatn con los parametros que metemos en la UI del addon
+# Fichero que genera homeassistant con los parametros que metemos en la UI del addon
 ENV OPTIONS_FILE=/data/options.json
 
 # Configurar ruta de ejecución de las herramientas SQL de Microsoft
