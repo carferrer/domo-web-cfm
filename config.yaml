@@ -15,7 +15,7 @@ schema:
   url: "str?"
   ssl_cert: "str?"
   ssl_key: "str?"
-  log_level: "trace|debug|info|notice|warning|error|fatal|critical" 
+  log_level: "list(trace|debug|info|notice|warning|error|fatal|critical)?"
 options:
   url: null
   ssl_cert: null
