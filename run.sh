@@ -82,10 +82,11 @@ cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
     LogLevel REPL_APACHE_LOG_LEVEL
 
     # Una sola línea para accesos: Guarda en disco (rotativo) y lo envía a la consola de HA sin duplicar en HA
-    CustomLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/access_log 86400 | /usr/bin/tee /dev/stdout" combined
+    CustomLog "|/usr/bin/tee -a /dev/stdout | /usr/bin/rotatelogs -n 15 /var/www/html/logs/access_log 86400" combined
+    
 
     # Una sola línea para errores: Guarda en disco (rotativo) y lo envía a la pantalla de fallos de HA sin duplicar en HA
-    ErrorLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/error_log 86400 | /usr/bin/tee /dev/stderr"
+    ErrorLog "|/usr/bin/tee -a /dev/stderr | /usr/bin/rotatelogs -n 15 /var/www/html/logs/error_log 86400"
     
     SSLEngine on
     SSLCertificateFile /etc/apache2/ssl/server.crt
