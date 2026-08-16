@@ -1,5 +1,5 @@
 name: "Domo WEB"
-version: "2026.08.24"
+version: "2026.08.25"
 slug: "domo-web-cfm"
 description: "Apache con soporte para MSSQL"
 url: "https://github.com/carferrer/domo-web-cfm"
@@ -23,3 +23,14 @@ ports:
   460/tcp: 460        # Puerto interno 460 fijo. El usuario cambia el externo en la pestaña Red.
 ports_description:
   460/tcp: "Puerto externo de acceso para Domo WEB"
+logger:
+  default: warning
+  logs:
+    - trace
+    - debug
+    - info
+    - notice
+    - warning
+    - error
+    - fatal
+    - critical
