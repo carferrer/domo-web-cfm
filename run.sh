@@ -68,7 +68,12 @@ fi
 # --- NUEVO: Desactivar el Log de errores global de Ubuntu para que use el tuyo ---
 echo "Corrigiendo directiva ErrorLog global de Ubuntu..."
 # Comentamos la línea de ErrorLog en la configuración principal para que no pise tu VirtualHost
-sed -i 's/^ErrorLog /# ErrorLog /g' /etc/apache2/apache2.conf
+# --- NUEVA SOLUCIÓN: Redirigir el log global al de tu carpeta compartida de HA ---
+echo "Redirigiendo el directorio de logs global de Apache..."
+mkdir -p /var/www/html/logs
+sed -i 's|export APACHE_LOG_DIR=.*|export APACHE_LOG_DIR=/var/www/html/logs|g' /etc/apache2/envvars
+# ---------------------------------------------------------------------------------
+
 # ---------------------------------------------------------------------------------
 
 
