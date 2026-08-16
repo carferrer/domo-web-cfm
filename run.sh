@@ -81,14 +81,12 @@ cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
     # Configuración del nivel de Log dinámico
     LogLevel REPL_APACHE_LOG_LEVEL
 
-    # Guarda el log en disco (rotativo) y ADEMÁS lo envía a la consola de Home Assistant (/dev/stdout)
-    CustomLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/access_log 86400" combined
-    CustomLog "|/usr/bin/tee -a /dev/stdout" combined
+    # Una sola línea para accesos: Guarda en disco (rotativo) y lo envía a la consola de HA sin duplicar en HA
+    CustomLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/access_log 86400 | /usr/bin/tee /dev/stdout" combined
 
-    # Guarda los errores en disco (rotativo) y ADEMÁS los envía a la pantalla de Home Assistant (/dev/stderr)
-    ErrorLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/error_log 86400"
-    ErrorLog "|/usr/bin/tee -a /dev/stderr"
-
+    # Una sola línea para errores: Guarda en disco (rotativo) y lo envía a la pantalla de fallos de HA sin duplicar en HA
+    ErrorLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/error_log 86400 | /usr/bin/tee /dev/stderr"
+    
     SSLEngine on
     SSLCertificateFile /etc/apache2/ssl/server.crt
     SSLCertificateKeyFile /etc/apache2/ssl/server.key
