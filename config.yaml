@@ -9,7 +9,7 @@ arch:
   - aarch64
   - amd64
 map:
-  - "addon_config:rw"
+  - "addon_config:rw" #dentro del addo en /config y es persistente y accesible con samba
   - "ssl:ro"
 schema:
   url: "str?"
