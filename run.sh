@@ -64,6 +64,14 @@ else
         -subj "/C=ES/ST=Local/L=HomeAssistant/O=ApacheAddon/CN=localhost"
 fi
 
+
+# --- NUEVO: Desactivar el Log de errores global de Ubuntu para que use el tuyo ---
+echo "Corrigiendo directiva ErrorLog global de Ubuntu..."
+# Comentamos la línea de ErrorLog en la configuración principal para que no pise tu VirtualHost
+sed -i 's/^ErrorLog /# ErrorLog /g' /etc/apache2/apache2.conf
+# ---------------------------------------------------------------------------------
+
+
 # 5. Generar VirtualHost apuntando estrictamente al puerto 460 interno
 # MODIFICADO: Se añade LogLevel dinámico, CustomLog duplicado y ErrorLog duplicado rotativo
 cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
