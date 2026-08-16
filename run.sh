@@ -71,10 +71,10 @@ echo "Corrigiendo directiva ErrorLog global de Ubuntu..."
 # --- NUEVA SOLUCIÓN: Redirigir el log global al de tu carpeta compartida de HA ---
 echo "Redirigiendo el directorio de logs global de Apache..."
 mkdir -p /var/www/html/logs
-sed -i 's|export APACHE_LOG_DIR=.*|export APACHE_LOG_DIR=/var/www/html/logs|g' /etc/apache2/envvars
-# ---------------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------------
+chmod -R 777 /var/www/html/html
+sed -i 's|export APACHE_LOG_DIR=.*|export APACHE_LOG_DIR=/var/www/html/logs|g' /etc/apache2/envvars
+
 
 
 # 5. Generar VirtualHost apuntando estrictamente al puerto 460 interno
