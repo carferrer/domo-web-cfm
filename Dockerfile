@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unixodbc-dev \
     php8.3 \
     libapache2-mod-php8.3 \
+	php-common \
     php8.3-dev \
     php8.3-xml \
     php8.3-odbc \
