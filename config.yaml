@@ -5,6 +5,9 @@ description: "Apache con soporte para MSSQL"
 url: "https://github.com/carferrer/domo-web-cfm"
 image: "ghcr.io/carferrer/domo-web-cfm"
 image_tag: "latest"
+# La imagen base oficial de Home Assistant ya incluye s6-overlay.
+# Evita que Supervisor añada un segundo init y provoque errores de PID 1.
+init: false
 arch:
   - aarch64
   - amd64
