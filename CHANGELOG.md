@@ -1,3 +1,11 @@
+# Versión 2026.09.02 (2026-09-19)
+
+## What's Changed
+* fix: aplicar permisos genéricos al contenido web by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/6
+
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.09.01...2026.09.02
+
 # Versión 2026.09.01 (2026-09-19)
 
 ## What's Changed
