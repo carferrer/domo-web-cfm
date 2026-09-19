@@ -1,19 +1,20 @@
 #!/bin/bash
 
+# CAMBIO: Mantener el arranque simple, pero documentar y validar mejor las opciones dinámicas.
 echo "Iniciando configuración dinámica del Add-on..."
 
-# 1. Leer las variables de Home Assistant (si vienen vacías, asigna un backup)
-#PUERTO hace referencia el puerto que mapea HA ya que el del docker dejo siempre 460
-#$OPTIONS_FILE se declara en el dockerfile
-SSL_CERT=$(jq --raw-output '.ssl_cert' $OPTIONS_FILE)
-SSL_KEY=$(jq --raw-output '.ssl_key' $OPTIONS_FILE)
-URL=$(jq --raw-output '.url' $OPTIONS_FILE)
+# CAMBIO: Garantizar una ruta por defecto al fichero de opciones de Home Assistant.
+OPTIONS_FILE=${OPTIONS_FILE:-/data/options.json}
 
-# --- NUEVO: Leer el nivel de log seleccionado en la interfaz de Home Assistant ---
-HA_LOG_LEVEL=$(jq --raw-output '.log_level // "warning"' $OPTIONS_FILE)
+# CAMBIO: Convertir valores JSON null en cadena vacía para que funcionen los valores por defecto.
+SSL_CERT=$(jq -r '.ssl_cert // empty' "$OPTIONS_FILE")
+SSL_KEY=$(jq -r '.ssl_key // empty' "$OPTIONS_FILE")
+URL=$(jq -r '.url // empty' "$OPTIONS_FILE")
+HA_LOG_LEVEL=$(jq -r '.log_level // "warning"' "$OPTIONS_FILE")
+
 echo "Nivel de log detectado desde la UI de Home Assistant: $HA_LOG_LEVEL"
 
-# Mapear niveles de Home Assistant al formato estricto de Apache
+# Mapear niveles de Home Assistant al formato estricto de Apache.
 APACHE_LOG_LEVEL="warn"
 case "$HA_LOG_LEVEL" in
   "critical"|"fatal") APACHE_LOG_LEVEL="crit" ;;
@@ -23,34 +24,45 @@ case "$HA_LOG_LEVEL" in
   "info")             APACHE_LOG_LEVEL="info" ;;
   "debug"|"trace")    APACHE_LOG_LEVEL="debug" ;;
 esac
-# ---------------------------------------------------------------------------------
 
+# CAMBIO: Aplicar nombres de certificado por defecto cuando no se hayan configurado en HA.
 CERT_NAME=${SSL_CERT:-fullchain.pem}
 KEY_NAME=${SSL_KEY:-privkey.pem}
 
-echo "Configurando Apache para usar el puerto interno: 460. Si ha ha mapeado ver UI del addon el HA"
+# CAMBIO: Usar localhost si la opción URL está vacía para evitar un ServerName inválido.
+SERVER_NAME=${URL:-localhost}
+
+echo "Configurando Apache para usar el puerto interno: 460."
 echo "Buscando certificado: $CERT_NAME"
 echo "Buscando llave privada: $KEY_NAME"
 
-# 2. Vincular directorio de desarrollo PHP en /config. Dentro de HA en app_config
+# CAMBIO: Crear explícitamente la estructura persistente utilizada por Apache/PHP.
 SHARE_DIR="/config"
-if [ ! -d "$SHARE_DIR" ]; then
-    echo "Creando la carpeta del proyecto en /config..."
-    mkdir -p "$SHARE_DIR"
-    echo "<?php phpinfo(); ?>" > "$SHARE_DIR/index.php"
-fi
+mkdir -p \
+    "$SHARE_DIR/html" \
+    "$SHARE_DIR/html/unifi_api" \
+    "$SHARE_DIR/logs" \
+    "$SHARE_DIR/conf"
+
+# CAMBIO: Mantener /var/www/html como enlace directo al almacenamiento persistente del add-on.
 rm -rf /var/www/html
 ln -s "$SHARE_DIR" /var/www/html
 
-# Asegurar que la carpeta de logs existe en /config para que rotatelogs no falle
+# CAMBIO: PHP necesita escribir únicamente en unifi_api; se eliminan permisos 777 globales sobre html.
+# Apache en Ubuntu se ejecuta como www-data, por lo que sólo esta carpeta se entrega a dicho usuario.
+chown -R www-data:www-data /var/www/html/html/unifi_api
+find /var/www/html/html/unifi_api -type d -exec chmod 775 {} \;
+find /var/www/html/html/unifi_api -type f -exec chmod 664 {} \;
+
+# Asegurar que la carpeta de logs existe para que rotatelogs no falle.
 mkdir -p /var/www/html/logs
 
-# 3. Reescribir el archivo ports.conf desde cero para evitar duplicados 👇
+# Reescribir ports.conf desde cero para evitar directivas Listen duplicadas.
 echo "Listen 460" > /etc/apache2/ports.conf
 
-# 4. Comprobar certificados SSL personalizados de Home Assistant
-CERT_FILE="$CERT_NAME"
-KEY_FILE="$KEY_NAME"
+# CAMBIO: Los certificados configurados por Home Assistant están montados en /ssl.
+CERT_FILE="/ssl/$CERT_NAME"
+KEY_FILE="/ssl/$KEY_NAME"
 
 if [ -f "$CERT_FILE" ] && [ -f "$KEY_FILE" ]; then
     echo "Certificados personalizados encontrados y validados."
@@ -64,59 +76,59 @@ else
         -subj "/C=ES/ST=Local/L=HomeAssistant/O=ApacheAddon/CN=localhost"
 fi
 
-
-# --- NUEVO: Desactivar el Log de errores global de Ubuntu para que use el tuyo ---
-echo "Corrigiendo directiva ErrorLog global de Ubuntu..."
-# Comentamos la línea de ErrorLog en la configuración principal para que no pise tu VirtualHost
-# --- NUEVA SOLUCIÓN: Redirigir el log global al de tu carpeta compartida de HA ---
+# Redirigir el directorio de logs global de Apache a la carpeta persistente del add-on.
 echo "Redirigiendo el directorio de logs global de Apache..."
 mkdir -p /var/www/html/logs
-
-chmod -R 777 /var/www/html/html
 sed -i 's|export APACHE_LOG_DIR=.*|export APACHE_LOG_DIR=/var/www/html/logs|g' /etc/apache2/envvars
 
-
-
-# 5. Generar VirtualHost apuntando estrictamente al puerto 460 interno
-# MODIFICADO: Se añade LogLevel dinámico, CustomLog duplicado y ErrorLog duplicado rotativo
+# Generar VirtualHost apuntando estrictamente al puerto interno 460.
 cat << 'EOF' > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:460>
     DocumentRoot /var/www/html/html
     ServerName server.server.com:460
     PHPINIDir /var/www/html/conf
-    
+
     <Directory "/var/www/html/html">
         Options FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
 
-    # Configuración del nivel de Log dinámico
+    # Configuración del nivel de Log dinámico.
     LogLevel REPL_APACHE_LOG_LEVEL
 
-    # MODIFICACIÓN: El acceso SOLO va al archivo de disco. Ya no se envía a /dev/stdout
+    # El acceso sólo va al archivo de disco.
     CustomLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/access_log 86400" combined
 
-    # El error va al archivo de disco Y ADEMÁS a la pantalla de Home Assistant
+    # Se mantiene temporalmente el sistema de ErrorLog actual; se revisará en un PR independiente.
     ErrorLog "|/usr/bin/rotatelogs -n 15 /var/www/html/logs/error_log 86400"
     ErrorLog "|/usr/bin/tee -a /dev/stderr"
 
     SSLEngine on
     SSLCertificateFile /etc/apache2/ssl/server.crt
     SSLCertificateKeyFile /etc/apache2/ssl/server.key
-    
+
 </VirtualHost>
 EOF
 
-# 6. Reemplazar las rutas, URL y el nivel de Log de forma segura dentro del archivo final
+# CAMBIO: Sustituir certificados, ServerName y nivel de log con los valores ya validados anteriormente.
 sed -i "s|/etc/apache2/ssl/server.crt|$CERT_FILE|g" /etc/apache2/sites-available/000-default.conf
 sed -i "s|/etc/apache2/ssl/server.key|$KEY_FILE|g" /etc/apache2/sites-available/000-default.conf
-sed -i "s|server.server.com:460|$URL|g" /etc/apache2/sites-available/000-default.conf
+sed -i "s|server.server.com:460|$SERVER_NAME|g" /etc/apache2/sites-available/000-default.conf
 sed -i "s|REPL_APACHE_LOG_LEVEL|$APACHE_LOG_LEVEL|g" /etc/apache2/sites-available/000-default.conf
 
-# 7. Cargar variables de entorno obligatorias de Apache en Ubuntu antes de lanzar el binario
+# Cargar variables de entorno obligatorias de Apache antes de validar y arrancar.
 . /etc/apache2/envvars
 
+# CAMBIO: Validar la configuración generada antes de iniciar Apache para fallar con un error claro.
+echo "Validando configuración de Apache..."
+if ! apache2ctl configtest; then
+    echo "ERROR: La configuración de Apache no es válida."
+    exit 1
+fi
+
+echo "Configuración de Apache correcta."
 echo "Iniciando Apache de forma segura..."
-# Cambiado a 'apache2' directo para asegurar que las variables previas se hereden correctamente en primer plano
+
+# Ejecutar Apache en primer plano para que Home Assistant supervise correctamente el proceso principal.
 exec apache2 -DFOREGROUND
