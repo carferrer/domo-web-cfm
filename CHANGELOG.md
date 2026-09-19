@@ -1,3 +1,16 @@
+# Versión 2026.09.01 (2026-09-19)
+
+## What's Changed
+* ci: añadir validación automática del add-on by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/1
+* build: usar imagen base oficial de Home Assistant by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/2
+* fix: robustecer run.sh y permisos de unifi_api by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/3
+* ci: añadir flujo preparar/publicar release by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/4
+
+## New Contributors
+* @carferrer made their first contribution in https://github.com/carferrer/domo-web-cfm/pull/1
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.08.35...2026.09.01
+
 # Versión 2026.08.35 (2026-08-18)
 
 **Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.08.34...2026.08.35
