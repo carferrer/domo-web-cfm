@@ -48,11 +48,13 @@ mkdir -p \
 rm -rf /var/www/html
 ln -s "$SHARE_DIR" /var/www/html
 
-# CAMBIO: PHP necesita escribir únicamente en unifi_api; se eliminan permisos 777 globales sobre html.
-# Apache en Ubuntu se ejecuta como www-data, por lo que sólo esta carpeta se entrega a dicho usuario.
-chown -R www-data:www-data /var/www/html/html/unifi_api
-find /var/www/html/html/unifi_api -type d -exec chmod 775 {} \;
-find /var/www/html/html/unifi_api -type f -exec chmod 664 {} \;
+# CAMBIO: Hacer que todo el contenido web sea propiedad de www-data para que el add-on
+# funcione con cualquier estructura PHP y no dependa de carpetas concretas como unifi_api.
+# Los directorios usan 775 y los archivos 664 para permitir lectura/escritura a Apache/PHP
+# sin volver a los permisos globales 777 utilizados anteriormente.
+chown -R www-data:www-data /var/www/html/html
+find /var/www/html/html -type d -exec chmod 775 {} \;
+find /var/www/html/html -type f -exec chmod 664 {} \;
 
 # Asegurar que la carpeta de logs existe para que rotatelogs no falle.
 mkdir -p /var/www/html/logs
