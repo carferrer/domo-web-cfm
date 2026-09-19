@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Validate Bash syntax
+        run: bash -n run.sh
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes shellcheck
+
+      - name: Run ShellCheck
+        run: shellcheck --severity=error run.sh
+
+      - name: Validate YAML syntax
+        run: |
+          python3 -m pip install --disable-pip-version-check --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          files = [
+              Path("config.yaml"),
+              Path("repository.yaml"),
+              *Path(".github/workflows").glob("*.yaml"),
+              *Path(".github/workflows").glob("*.yml"),
+          ]
+
+          for path in files:
+              with path.open("r", encoding="utf-8") as file:
+                  yaml.safe_load(file)
+              print(f"OK: {path}")
+          PY
+
+  build:
+    name: Build ${{ matrix.arch }}
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Build container image
+        run: |
+          docker build \
+            --build-arg BUILD_VERSION=ci \
+            --tag domo-web-cfm:ci-${{ matrix.arch }} \
+            .
+
+      - name: Verify PHP extensions
+        run: |
+          docker run --rm \
+            --entrypoint php \
+            domo-web-cfm:ci-${{ matrix.arch }} \
+            -r 'foreach (["sqlsrv", "pdo_sqlsrv", "odbc", "curl"] as $ext) { if (!extension_loaded($ext)) { fwrite(STDERR, "Missing PHP extension: $ext\n"); exit(1); } echo "OK: $ext\n"; }'
+
+      - name: Verify Apache configuration
+        run: |
+          docker run --rm \
+            --entrypoint apache2ctl \
+            domo-web-cfm:ci-${{ matrix.arch }} \
+            configtest
