@@ -67,12 +67,15 @@ ENV PATH="$PATH:/opt/mssql-tools18/bin"
 # 1. Activar módulos de Apache para SSL
 RUN a2enmod ssl headers
 
-# 2. Copiar el script de inicio al contenedor
+# 2. Copiar el script de configuración/arranque y la definición del servicio s6
 COPY run.sh /run.sh
-RUN chmod +x /run.sh
+COPY rootfs /
+RUN chmod +x \
+    /run.sh \
+    /etc/s6-overlay/s6-rc.d/apache/run
 
 # Exponemos el puerto interno fijo del contenedor (Apache siempre escuchará internamente en el 460)
 EXPOSE 460
 
-# Ejecutar el script al iniciar el contenedor
-CMD [ "/run.sh" ]
+# No se define CMD: la imagen base arranca s6-overlay como PID 1 y el servicio
+# apache definido en rootfs ejecuta /run.sh bajo supervisión de s6.
