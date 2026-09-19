@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ghcr.io/home-assistant/base-ubuntu:24.04
 
 # Declarar el argumento para eliminar el warning de variable indefinida
 ARG BUILD_VERSION=local
