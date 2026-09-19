@@ -1,3 +1,12 @@
+# Versión 2026.09.04 (2026-09-19)
+
+## What's Changed
+* ci: evitar repetir CI tras merge en main by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/10
+* refactor: ejecutar Apache bajo s6-overlay by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/11
+
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.09.03...2026.09.04
+
 # Versión 2026.09.03 (2026-09-19)
 
 ## What's Changed
