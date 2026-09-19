@@ -1,3 +1,11 @@
+# Versión 2026.09.03 (2026-09-19)
+
+## What's Changed
+* fix: desactivar init del Supervisor con s6-overlay by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/8
+
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.09.02...2026.09.03
+
 # Versión 2026.09.02 (2026-09-19)
 
 ## What's Changed
