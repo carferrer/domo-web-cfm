@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# s6 supervisa este proceso. run.sh mantiene la configuración dinámica
+# existente y termina con exec apache2 -DFOREGROUND.
+exec /run.sh
