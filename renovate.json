@@ -14,7 +14,7 @@
   "commitMessageTopic": "{{depName}}",
   "packageRules": [
     {
-      "description": "Mantener la imagen base en Ubuntu 24.04 hasta migrar PHP y el repositorio MSSQL",
+      "description": "Mantener la imagen base en Ubuntu 24.04 hasta validar la compatibilidad completa del stack, especialmente PHP 8.3",
       "matchDatasources": [
         "docker"
       ],
