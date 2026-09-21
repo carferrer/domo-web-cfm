@@ -1,7 +1,23 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bashio
+# CAMBIO: Bashio usa un shebang propio de Home Assistant que ShellCheck no reconoce.
+# Se indica explícitamente que el script usa sintaxis Bash para que la validación CI sea correcta.
+# shellcheck shell=bash
 
 # CAMBIO: Mantener el arranque simple, pero documentar y validar mejor las opciones dinámicas.
 echo "Iniciando configuración dinámica del Add-on..."
+
+# CAMBIO: Obtener la zona horaria configurada en Home Assistant/Supervisor.
+# /info es accesible para los add-ons con el rol por defecto y no requiere hassio_api: true.
+TIMEZONE="$(bashio::api.supervisor 'GET' '/info' '' '.timezone' 2>/dev/null || true)"
+
+if [ -n "$TIMEZONE" ] && [ -f "/usr/share/zoneinfo/$TIMEZONE" ]; then
+    ln -snf "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime
+    echo "$TIMEZONE" > /etc/timezone
+    export TZ="$TIMEZONE"
+    echo "Zona horaria configurada desde Home Assistant: $TIMEZONE"
+else
+    echo "AVISO: No se pudo obtener una zona horaria válida de Home Assistant. Se mantiene la zona horaria del contenedor."
+fi
 
 # CAMBIO: Garantizar una ruta por defecto al fichero de opciones de Home Assistant.
 OPTIONS_FILE=${OPTIONS_FILE:-/data/options.json}
