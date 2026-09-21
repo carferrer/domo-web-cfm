@@ -135,8 +135,17 @@ sed -i "s|/etc/apache2/ssl/server.key|$KEY_FILE|g" /etc/apache2/sites-available/
 sed -i "s|server.server.com:460|$SERVER_NAME|g" /etc/apache2/sites-available/000-default.conf
 sed -i "s|REPL_APACHE_LOG_LEVEL|$APACHE_LOG_LEVEL|g" /etc/apache2/sites-available/000-default.conf
 
-# Cargar variables de entorno obligatorias de Apache antes de validar y arrancar.
+# CAMBIO: Bashio activa el control estricto de variables no definidas (nounset), mientras que
+# /etc/apache2/envvars de Ubuntu/Debian espera que APACHE_CONFDIR haya sido inicializada por apache2ctl.
+# Como este script carga envvars directamente, definimos explícitamente la ruta estándar de Apache.
+export APACHE_CONFDIR="${APACHE_CONFDIR:-/etc/apache2}"
+
+# CAMBIO: El fichero envvars pertenece al paquete de Apache y no está diseñado para ejecutarse
+# con nounset activo. Se desactiva únicamente durante su carga y se reactiva inmediatamente después.
+# Esto evita errores "unbound variable" sin reducir el control estricto en el resto de run.sh.
+set +u
 . /etc/apache2/envvars
+set -u
 
 # CAMBIO: Validar la configuración generada antes de iniciar Apache para fallar con un error claro.
 echo "Validando configuración de Apache..."
