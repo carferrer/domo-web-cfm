@@ -1,3 +1,11 @@
+# Versión 2026.09.07 (2026-09-21)
+
+## What's Changed
+* fix: compatibilizar envvars de Apache con Bashio by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/19
+
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.09.06...2026.09.07
+
 # Versión 2026.09.06 (2026-09-21)
 
 ## What's Changed
