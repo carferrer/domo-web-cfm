@@ -1,4 +1,7 @@
 #!/usr/bin/with-contenv bashio
+# CAMBIO: Bashio usa un shebang propio de Home Assistant que ShellCheck no reconoce.
+# Se indica explícitamente que el script usa sintaxis Bash para que la validación CI sea correcta.
+# shellcheck shell=bash
 
 # CAMBIO: Mantener el arranque simple, pero documentar y validar mejor las opciones dinámicas.
 echo "Iniciando configuración dinámica del Add-on..."
