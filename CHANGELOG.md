@@ -1,3 +1,15 @@
+# Versión 2026.09.06 (2026-09-21)
+
+## What's Changed
+* chore: añadir Renovate by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/14
+* ⬆️ Pin actions/checkout action to 3d3c42e by @renovate[bot] in https://github.com/carferrer/domo-web-cfm/pull/15
+* fix: usar la zona horaria de Home Assistant by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/17
+
+## New Contributors
+* @renovate[bot] made their first contribution in https://github.com/carferrer/domo-web-cfm/pull/15
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.09.05...2026.09.06
+
 # Versión 2026.09.05 (2026-09-19)
 
 ## What's Changed
