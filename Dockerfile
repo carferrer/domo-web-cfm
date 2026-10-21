@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN set -eu; \
     min_php_pkg="8.3.6-0ubuntu0.24.04.13"; \
     for pkg in php8.3-cli php8.3-common libapache2-mod-php8.3; do \
-        installed="$(dpkg-query -W -f='\u0024{Version}' "$pkg")"; \
+        installed="$(dpkg-query -W -f='${Version}' "$pkg")"; \
         if ! dpkg --compare-versions "$installed" ge "$min_php_pkg"; then \
             echo "ERROR: $pkg=$installed no incluye la corrección USN-8948-1 (mínimo $min_php_pkg)" >&2; \
             exit 1; \
