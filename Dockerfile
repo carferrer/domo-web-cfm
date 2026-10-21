@@ -69,8 +69,8 @@ RUN set -eu; \
             "https://pecl.php.net/get/${ext}-5.13.3.tgz" -o "/tmp/${ext}.tgz"; \
         pecl install "/tmp/${ext}.tgz"; \
         rm "/tmp/${ext}.tgz"; \
-    done \
-    && printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/8.3/mods-available/sqlsrv.ini \
+    done; \
+    printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/8.3/mods-available/sqlsrv.ini \
     && printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/8.3/mods-available/pdo_sqlsrv.ini \
     && phpenmod sqlsrv pdo_sqlsrv
 
