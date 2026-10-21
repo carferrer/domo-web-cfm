@@ -34,6 +34,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     php-pear \
     && rm -rf /var/lib/apt/lists/*
 
+# Seguridad (Ubuntu USN-8948-1, 21-10-2026): exigir paquetes con las
+# correcciones para CVE-2026-109618 y CVE-2026-109619.
+# Ubuntu aplica backports: la versión del paquete no coincide con PHP upstream.
+# Si el mirror aún no dispone de la corrección, NO publicar una imagen vulnerable.
+RUN set -eu; \
+    min_php_pkg="8.3.6-0ubuntu0.24.04.13"; \
+    for pkg in php8.3-cli php8.3-common libapache2-mod-php8.3; do \
+        installed="$(dpkg-query -W -f='${Version}' "$pkg")"; \
+        if ! dpkg --compare-versions "$installed" ge "$min_php_pkg"; then \
+            echo "ERROR: $pkg=$installed no incluye la corrección USN-8948-1 (mínimo $min_php_pkg)" >&2; \
+            exit 1; \
+        fi; \
+        echo "Seguridad PHP OK: $pkg=$installed"; \
+    done
+
 # PASO 2: Registrar las llaves y el repositorio oficial de Microsoft para Ubuntu 24.04
 RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" > /etc/apt/sources.list.d/mssql-release.list
@@ -45,15 +60,24 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends msodbcsql18 mssql-tools18 \
     && rm -rf /var/lib/apt/lists/*
 
-# PASO 4: Compilar extensiones de SQL Server mediante PECL
-RUN pecl install sqlsrv pdo_sqlsrv \
-    && printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/8.3/mods-available/sqlsrv.ini \
+# PASO 4: Compilar ambas extensiones desde una versión explícita de PECL.
+# Descargar los tarballs evita depender del índice REST de PECL.
+# Instalar por separado impide que un éxito oculte el fallo de la otra extensión.
+RUN set -eu; \
+    for ext in sqlsrv pdo_sqlsrv; do \
+        curl -fsSL --retry 3 --retry-all-errors \
+            "https://pecl.php.net/get/${ext}-5.13.3.tgz" -o "/tmp/${ext}.tgz"; \
+        pecl install "/tmp/${ext}.tgz"; \
+        rm "/tmp/${ext}.tgz"; \
+    done; \
+    printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/8.3/mods-available/sqlsrv.ini \
     && printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/8.3/mods-available/pdo_sqlsrv.ini \
     && phpenmod sqlsrv pdo_sqlsrv
 
 # PASO 5: Limpieza profunda de paquetes de compilación para reducir espacio
 RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unixodbc-dev \
-    && apt-get clean
+    && apt-get clean \
+    && php -r 'foreach (["sqlsrv", "pdo_sqlsrv", "odbc", "curl"] as $ext) { if (!extension_loaded($ext)) { fwrite(STDERR, "Missing PHP extension: $ext\n"); exit(1); } echo "OK: $ext\n"; }'
 
 #instala jq para poder leer el fichero OPTIONS_FILE de parametros desde HA
 RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
