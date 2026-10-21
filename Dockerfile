@@ -34,6 +34,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     php-pear \
     && rm -rf /var/lib/apt/lists/*
 
+# Seguridad (Ubuntu USN-8948-1, 21-10-2026): exigir paquetes con las
+# correcciones para CVE-2026-109618 y CVE-2026-109619.
+# Ubuntu aplica backports: la versión del paquete no coincide con PHP upstream.
+# Si el mirror aún no dispone de la corrección, NO publicar una imagen vulnerable.
+RUN set -eu; \
+    min_php_pkg="8.3.6-0ubuntu0.24.04.13"; \
+    for pkg in php8.3-cli php8.3-common libapache2-mod-php8.3; do \
+        installed="$(dpkg-query -W -f='\u0024{Version}' "$pkg")"; \
+        if ! dpkg --compare-versions "$installed" ge "$min_php_pkg"; then \
+            echo "ERROR: $pkg=$installed no incluye la corrección USN-8948-1 (mínimo $min_php_pkg)" >&2; \
+            exit 1; \
+        fi; \
+        echo "Seguridad PHP OK: $pkg=$installed"; \
+    done
+
 # PASO 2: Registrar las llaves y el repositorio oficial de Microsoft para Ubuntu 24.04
 RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" > /etc/apt/sources.list.d/mssql-release.list
