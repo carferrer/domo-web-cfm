@@ -60,15 +60,24 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends msodbcsql18 mssql-tools18 \
     && rm -rf /var/lib/apt/lists/*
 
-# PASO 4: Compilar extensiones de SQL Server mediante PECL
-RUN pecl install sqlsrv pdo_sqlsrv \
+# PASO 4: Compilar ambas extensiones desde una versión explícita de PECL.
+# Descargar los tarballs evita depender del índice REST de PECL.
+# Instalar por separado impide que un éxito oculte el fallo de la otra extensión.
+RUN set -eu; \
+    for ext in sqlsrv pdo_sqlsrv; do \
+        curl -fsSL --retry 3 --retry-all-errors \
+            "https://pecl.php.net/get/${ext}-5.13.3.tgz" -o "/tmp/${ext}.tgz"; \
+        pecl install "/tmp/${ext}.tgz"; \
+        rm "/tmp/${ext}.tgz"; \
+    done \
     && printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/8.3/mods-available/sqlsrv.ini \
     && printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/8.3/mods-available/pdo_sqlsrv.ini \
     && phpenmod sqlsrv pdo_sqlsrv
 
 # PASO 5: Limpieza profunda de paquetes de compilación para reducir espacio
 RUN apt-get purge -y --auto-remove build-essential make php8.3-dev php-pear unixodbc-dev \
-    && apt-get clean
+    && apt-get clean \
+    && php -r 'foreach (["sqlsrv", "pdo_sqlsrv", "odbc", "curl"] as $ext) { if (!extension_loaded($ext)) { fwrite(STDERR, "Missing PHP extension: $ext\n"); exit(1); } echo "OK: $ext\n"; }'
 
 #instala jq para poder leer el fichero OPTIONS_FILE de parametros desde HA
 RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
