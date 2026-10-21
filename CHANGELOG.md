@@ -1,3 +1,11 @@
+# Versión 2026.10.01 (2026-10-21)
+
+## What's Changed
+* Seguridad: bloquear builds con PHP vulnerable (USN-8948-1) by @carferrer in https://github.com/carferrer/domo-web-cfm/pull/21
+
+
+**Full Changelog**: https://github.com/carferrer/domo-web-cfm/compare/2026.09.07...2026.10.01
+
 # Versión 2026.09.07 (2026-09-21)
 
 ## What's Changed
