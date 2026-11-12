@@ -1,10 +1,12 @@
 name: "Domo WEB"
-version: 2026.10.01
+version: "2026.11.12"
+# Migracion a imagen privada: requiere credenciales y revision manual.
+breaking_versions:
+  - "2026.11.12"
 slug: "domo-web-cfm"
-description: "Apache con soporte para MSSQL"
+description: "Aplicacion domotica PHP con MSSQL, distribuida como imagen privada"
 url: "https://github.com/carferrer/domo-web-cfm"
-image: "ghcr.io/carferrer/domo-web-cfm"
-image_tag: "latest"
+image: "ghcr.io/carferrer/domotica-php-cfm"
 # La imagen base oficial de Home Assistant ya incluye s6-overlay.
 # Evita que Supervisor añada un segundo init y provoque errores de PID 1.
 init: false
