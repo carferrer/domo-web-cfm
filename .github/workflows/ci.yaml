@@ -35,6 +35,11 @@ jobs:
           config = yaml.safe_load(Path("config.yaml").read_text())
           assert isinstance(config["version"], str)
           assert config["image"] == "ghcr.io/carferrer/domotica-php-cfm"
+          assert config["ingress"] is True
+          assert config["ingress_port"] == 8099
+          assert config["ingress_entry"] == "bticino.php"
+          assert config["panel_admin"] is True
+          assert "8099/tcp" not in config["ports"]
           assert "image_tag" not in config
           assert "2026.11.12" in config["breaking_versions"]
           assert config["slug"] == "domo-web-cfm"

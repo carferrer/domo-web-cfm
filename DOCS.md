@@ -2,7 +2,7 @@
 
 Este repositorio es el catalogo publico del add-on. No contiene la aplicacion PHP
 ni credenciales. Home Assistant descarga la imagen privada ya construida:
-`ghcr.io/carferrer/domotica-php-cfm:2026.11.12`.
+`ghcr.io/carferrer/domotica-php-cfm:2026.11.12.1`.
 
 Se conserva el slug `domo-web-cfm`, la URL de este repositorio, el puerto interno
 460, los montajes addon_config y ssl y las opciones existentes. Actualizar el
@@ -30,16 +30,50 @@ La version 2026.11.12 figura en breaking_versions para exigir actualizacion manu
 ## Actualizar y comprobar
 
 1. Refrescar las actualizaciones de la tienda sin cambiar la URL del repositorio.
-2. Comprobar que Domo WEB ofrece 2026.11.12 y actualizar el add-on existente.
+2. Comprobar que Domo WEB ofrece 2026.11.12.1 y actualizar el add-on existente.
 3. Iniciar y revisar sus registros: la configuracion y las reglas deben prepararse
    antes de que Apache abra el puerto.
 4. Probar login, OTP, cierre de sesion, una consulta web, MSSQL API, UniFi y un
    Atajo del iPhone habitual. Probar los comandos fisicos solo cuando sea seguro
-   hacerlo. Esta version no incorpora Ingress.
+   hacerlo. Comprobar tambien el acceso Ingress descrito abajo.
 
 El PHP se ejecuta desde `/opt/domo/html`, incluido en la imagen. El PHP de
 `/config/html` se conserva, pero ya no se sirve. Las actualizaciones de codigo
 se distribuyen mediante una nueva imagen, no copiando PHP al antiguo html.
+
+## Acceso Ingress y HTTPS directo
+
+Desde la version 2026.11.12.1, **Abrir interfaz web** muestra la aplicacion dentro
+de Home Assistant. Se puede activar **Mostrar en la barra lateral** en el
+complemento; el panel Domotica se limita a administradores de Home Assistant.
+
+Abrir Home Assistant por **HTTPS**: las cookies de la aplicacion siguen siendo
+Secure y no funcionan si se abre HA por HTTP. Esta primera fase sigue solicitando
+usuario, contrasena y OTP de la aplicacion; todavia no hay inicio automatico con
+la identidad de Home Assistant.
+
+La URL HTTPS habitual del add-on y el puerto externo configurado siguen
+disponibles. Ingress usa el puerto interno 8099, accesible solamente desde el
+Supervisor; no publicarlo en la red ni en el router. No hay que cambiar las
+opciones, los certificados, la configuracion privada o la base de datos.
+
+Las sesiones y el navegador recordado son independientes entre ambos accesos.
+Cerrar sesion en Ingress no cierra la sesion HTTPS directa. Las API MSSQL, UniFi
+y Atajos conservan su acceso directo; no se sirven a traves de Ingress.
+
+Tras actualizar:
+
+1. Abrir HA por HTTPS y pulsar Abrir interfaz web; comprobar login y OTP.
+2. Navegar entre paginas y comprobar estilos, imagenes, botones y regreso al inicio.
+3. Probar un formulario y un comando controlado; deben permanecer dentro del panel.
+4. Probar desconectar, recordar navegador y el acceso por la URL HTTPS habitual.
+5. Comprobar un Atajo del iPhone y las actualizaciones habituales de MSSQL/UniFi.
+
+Si la sesion vuelve a pedir acceso inmediatamente, comprobar primero que la URL
+de Home Assistant empieza por HTTPS. Si Ingress falla, el acceso HTTPS directo
+sigue disponible para diagnosticar; revisar tambien los registros del complemento.
+El registro de acceso Ingress esta en /config/logs/ingress_access_log y no incluye
+URLs, cabeceras ni cookies.
 
 ## Configuracion y datos persistentes
 
@@ -65,7 +99,7 @@ sigue copiandose; la proteccion de OtpWeb sigue incluida en la imagen.
 - Si es necesario volver atras: detener el add-on y restaurar su backup anterior
   desde HA. Si ese backup no permite recuperar la imagen anterior, restaurar la
   instantanea completa conservada. No desinstalar ni borrar carpetas para probar.
-  No actualizar otra vez a 2026.11.12 hasta resolver la causa.
+  No repetir la actualizacion hasta resolver la causa.
 
 ## Mantenimiento del catalogo
 

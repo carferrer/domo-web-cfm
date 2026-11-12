@@ -1,3 +1,12 @@
+# Versión 2026.11.12.1 (2026-11-12)
+
+- Activa Ingress con panel Domotica para administradores de Home Assistant.
+- Mantiene el acceso HTTPS directo y las API existentes.
+- Conserva login, OTP y CSRF; sesiones y cookies separadas para cada entrada.
+- Requiere abrir Home Assistant por HTTPS para conservar las cookies seguras.
+- Imagen privada publicada y validada en amd64 y aarch64 antes de actualizar el catalogo.
+- Consultar DOCS.md para actualizar y probar ambos accesos.
+
 # Versión 2026.11.12 (2026-11-12)
 
 - Migracion manual a la imagen privada con PHP integrado.
