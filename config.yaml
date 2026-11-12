@@ -1,5 +1,5 @@
 name: "Domo WEB"
-version: "2026.11.12"
+version: "2026.11.12.1"
 # Migracion a imagen privada: requiere credenciales y revision manual.
 breaking_versions:
   - "2026.11.12"
@@ -30,3 +30,11 @@ ports:
   460/tcp: 460        # Puerto interno 460 fijo. El usuario cambia el externo en la pestaña Red.
 ports_description:
   460/tcp: "Puerto externo de acceso para Domo WEB"
+
+# Puerto interno exclusivo del Supervisor; no se publica en ports.
+ingress: true
+ingress_port: 8099
+ingress_entry: bticino.php
+panel_icon: mdi:home-automation
+panel_title: Domotica
+panel_admin: true
