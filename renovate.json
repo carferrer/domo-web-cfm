@@ -11,17 +11,5 @@
     "dependencies"
   ],
   "commitMessagePrefix": "⬆️",
-  "commitMessageTopic": "{{depName}}",
-  "packageRules": [
-    {
-      "description": "Mantener la imagen base en Ubuntu 24.04 hasta validar la compatibilidad completa del stack, especialmente PHP 8.3",
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchPackageNames": [
-        "ghcr.io/home-assistant/base-ubuntu"
-      ],
-      "allowedVersions": "/^24\\.04$/"
-    }
-  ]
+  "commitMessageTopic": "{{depName}}"
 }

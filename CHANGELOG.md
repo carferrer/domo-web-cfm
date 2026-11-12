@@ -1,3 +1,12 @@
+# Versión 2026.11.12 (2026-11-12)
+
+- Migracion manual a la imagen privada con PHP integrado.
+- Se conservan identificador, puertos, carpetas y opciones del add-on.
+- Requiere credenciales GHCR de lectura y configuracion privada existente.
+- Generacion automatica de reglas IP al arrancar; php.ini personalizado opcional.
+- El repositorio publico pasa a ser solo catalogo; se retiran builds y arranque antiguos.
+- Consultar DOCS.md antes de actualizar. Ingress queda pendiente.
+
 # Versión 2026.10.01 (2026-10-21)
 
 ## What's Changed

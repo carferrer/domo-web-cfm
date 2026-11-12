@@ -9,79 +9,49 @@ permissions:
 
 jobs:
   validate:
-    name: Validate repository
-    runs-on: ubuntu-latest
-
+    name: Validar catalogo publico
+    runs-on: ubuntu-24.04
     steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-
-      - name: Validate Bash syntax
-        run: bash -n run.sh
-
-      - name: Install ShellCheck
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes shellcheck
-
-      - name: Run ShellCheck
-        run: shellcheck --severity=error run.sh
-
-      - name: Validate YAML syntax
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Validar YAML e invariantes del catalogo
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           python3 -m pip install --disable-pip-version-check --quiet pyyaml
           python3 - <<'PY'
+          import json
+          import os
+          import subprocess
           from pathlib import Path
           import yaml
 
-          files = [
-              Path("config.yaml"),
-              Path("repository.yaml"),
-              *Path(".github/workflows").glob("*.yaml"),
-              *Path(".github/workflows").glob("*.yml"),
-          ]
-
-          for path in files:
-              with path.open("r", encoding="utf-8") as file:
-                  yaml.safe_load(file)
-              print(f"OK: {path}")
+          for path in [Path("config.yaml"), Path("repository.yaml"), *Path(".github/workflows").glob("*.yaml")]:
+              yaml.safe_load(path.read_text(encoding="utf-8"))
+              print(f"YAML OK: {path}")
+          json.loads(Path("renovate.json").read_text())
+          config = yaml.safe_load(Path("config.yaml").read_text())
+          assert isinstance(config["version"], str)
+          assert config["image"] == "ghcr.io/carferrer/domotica-php-cfm"
+          assert "image_tag" not in config
+          assert "2026.11.12" in config["breaking_versions"]
+          assert config["slug"] == "domo-web-cfm"
+          assert config["init"] is False
+          assert set(config["arch"]) == {"amd64", "aarch64"}
+          base = os.environ.get("BASE_SHA")
+          if base:
+              anterior = yaml.safe_load(subprocess.check_output(["git", "show", base + ":config.yaml"], text=True))
+              for clave in ["slug", "name", "url", "arch", "init", "map", "ports", "ports_description", "schema", "options"]:
+                  assert config[clave] == anterior[clave], f"Cambio de compatibilidad: {clave}"
+              repo_anterior = subprocess.check_output(["git", "show", base + ":repository.yaml"])
+              assert Path("repository.yaml").read_bytes() == repo_anterior
+          assert not Path("Dockerfile").exists()
+          assert not Path("run.sh").exists()
+          assert not Path("rootfs").exists()
+          assert not list(Path(".").rglob("*.php"))
+          for obsoleto in ["builder.yaml", "prepare-release.yaml", "publish-release.yaml"]:
+              assert not (Path(".github/workflows") / obsoleto).exists()
+          print("OK: identidad, opciones y almacenamiento conservados; catalogo sin PHP ni builds")
           PY
-
-  build:
-    name: Build ${{ matrix.arch }}
-    needs: validate
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: amd64
-            runner: ubuntu-24.04
-          - arch: aarch64
-            runner: ubuntu-24.04-arm
-
-    runs-on: ${{ matrix.runner }}
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-
-      - name: Build container image
-        run: |
-          docker build \
-            --build-arg BUILD_VERSION=ci \
-            --tag domo-web-cfm:ci-${{ matrix.arch }} \
-            .
-
-      - name: Verify PHP extensions
-        run: |
-          docker run --rm \
-            --entrypoint php \
-            domo-web-cfm:ci-${{ matrix.arch }} \
-            -r 'foreach (["sqlsrv", "pdo_sqlsrv", "odbc", "curl"] as $ext) { if (!extension_loaded($ext)) { fwrite(STDERR, "Missing PHP extension: $ext\n"); exit(1); } echo "OK: $ext\n"; }'
-
-      - name: Verify Apache configuration
-        run: |
-          docker run --rm \
-            --entrypoint apache2ctl \
-            domo-web-cfm:ci-${{ matrix.arch }} \
-            configtest
