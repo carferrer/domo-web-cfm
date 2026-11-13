@@ -1,3 +1,11 @@
+# Versión 2026.11.13.2 (2026-11-13)
+
+- Acceso automatico opcional por Ingress mediante vinculacion explicita de usuario HA con usuario MSSQL.
+- Desactivado por defecto: configurar ingress_usuarios solo en el fichero privado.
+- Conserva permisos SQL, CSRF y autenticacion con contrasena/OTP por HTTPS directo.
+- Explica el cierre de sesion por Ingress y reserva la gestion OTP al acceso HTTPS habitual.
+- Imagen privada publicada y validada para amd64 y aarch64; sin cambios en las API.
+
 # Versión 2026.11.13.1 (2026-11-13)
 
 - Corrige el regreso a la pagina de origen tras enviar comandos por Ingress.
