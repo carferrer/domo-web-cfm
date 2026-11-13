@@ -1,3 +1,9 @@
+# Versión 2026.11.13.6 (2026-11-13)
+
+- Actualiza la imagen privada, publicada y validada para amd64 y aarch64.
+- Revisar las notas funcionales antes de fusionar este PR.
+- La fusion del catalogo y la actualizacion en Home Assistant siguen siendo manuales.
+
 # Versión 2026.11.13.5 (2026-11-13)
 
 - Actualiza la imagen privada, publicada y validada para amd64 y aarch64.
