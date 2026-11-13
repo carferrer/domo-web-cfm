@@ -1,3 +1,9 @@
+# Versión 2026.11.13.3 (2026-11-13)
+
+- Actualiza la imagen privada, publicada y validada para amd64 y aarch64.
+- Revisar las notas funcionales antes de fusionar este PR.
+- La fusion del catalogo y la actualizacion en Home Assistant siguen siendo manuales.
+
 # Versión 2026.11.13.2 (2026-11-13)
 
 - Acceso automatico opcional por Ingress mediante vinculacion explicita de usuario HA con usuario MSSQL.
