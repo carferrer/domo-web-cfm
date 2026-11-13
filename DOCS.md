@@ -2,7 +2,7 @@
 
 Este repositorio es el catalogo publico del add-on. No contiene la aplicacion PHP
 ni credenciales. Home Assistant descarga la imagen privada ya construida:
-`ghcr.io/carferrer/domotica-php-cfm:2026.11.13.1`.
+`ghcr.io/carferrer/domotica-php-cfm:2026.11.13.2`.
 
 Se conserva el slug `domo-web-cfm`, la URL de este repositorio, el puerto interno
 460, los montajes addon_config y ssl y las opciones existentes. Actualizar el
@@ -30,7 +30,7 @@ La version 2026.11.12 figura en breaking_versions para exigir actualizacion manu
 ## Actualizar y comprobar
 
 1. Refrescar las actualizaciones de la tienda sin cambiar la URL del repositorio.
-2. Comprobar que Domo WEB ofrece 2026.11.13.1 y actualizar el add-on existente.
+2. Comprobar que Domo WEB ofrece 2026.11.13.2 y actualizar el add-on existente.
 3. Iniciar y revisar sus registros: la configuracion y las reglas deben prepararse
    antes de que Apache abra el puerto.
 4. Probar login, OTP, cierre de sesion, una consulta web, MSSQL API, UniFi y un
@@ -60,9 +60,9 @@ de Home Assistant. Se puede activar **Mostrar en la barra lateral** en el
 complemento; el panel Domotica se limita a administradores de Home Assistant.
 
 Abrir Home Assistant por **HTTPS**: las cookies de la aplicacion siguen siendo
-Secure y no funcionan si se abre HA por HTTP. Esta primera fase sigue solicitando
-usuario, contrasena y OTP de la aplicacion; todavia no hay inicio automatico con
-la identidad de Home Assistant.
+Secure y no funcionan si se abre HA por HTTP. Por defecto se solicitan usuario,
+contrasena y OTP de la aplicacion. Desde 2026.11.13.2 se puede activar el acceso
+automatico vinculando explicitamente una identidad HA con un usuario MSSQL.
 
 La URL HTTPS habitual del add-on y el puerto externo configurado siguen
 disponibles. Ingress usa el puerto interno 8099, accesible solamente desde el
@@ -86,6 +86,41 @@ de Home Assistant empieza por HTTPS. Si Ingress falla, el acceso HTTPS directo
 sigue disponible para diagnosticar; revisar tambien los registros del complemento.
 El registro de acceso Ingress esta en /config/logs/ingress_access_log y no incluye
 URLs, cabeceras ni cookies.
+
+## Acceso automatico opcional por Ingress
+
+Desde 2026.11.13.2, la opcion `ingress_usuarios` en
+`/config/conf/configuracion_privada.php` vincula el ID interno de un usuario HA
+con el ID entero de su usuario en `dbo.usuarios`. No se necesitan contrasenas
+adicionales. La opcion ausente o vacia conserva el login y OTP actuales.
+
+Configurar la relacion solo en el fichero privado, nunca en este repositorio:
+
+```php
+'ingress_usuarios' => [
+    'ID_INTERNO_DE_HOME_ASSISTANT' => 7,
+],
+```
+
+Sustituir el identificador HA (32 caracteres hexadecimales) y el entero SQL por
+los valores locales correctos, y reiniciar el complemento. Son ejemplos, no
+valores que deban copiarse literalmente. No usar el nombre visible ni el token
+de la URL Ingress como identificador.
+
+Solo las identidades vinculadas pueden entrar automaticamente; una identidad
+ausente o desconocida se rechaza. Se mantienen permisos y fechas MSSQL y CSRF.
+La URL HTTPS habitual sigue exigiendo contrasena y OTP segun su configuracion.
+La gestion de OTP se realiza desde esa URL HTTPS, no desde la sesion automatica.
+
+Desconectar cierra la sesion PHP, pero no la sesion de Home Assistant; volver
+a abrir Ingress inicia otra automaticamente. Para salir de HA, utilizar su
+cierre de sesion. Tras 30 minutos de inactividad se crea otra sesion al abrir
+una pagina; un formulario POST caducado se rechaza y debe abrirse de nuevo.
+La seguridad de este acceso depende de la autenticacion de HA; utilizar su MFA.
+
+Para desactivar: `'ingress_usuarios' => []` y reiniciar. Probar entrada por HA,
+comando controlado, cierre y acceso HTTPS; comprobar que una identidad no vinculada
+no obtiene acceso. No requiere cambios de tablas ni modifica las API.
 
 ## Configuracion y datos persistentes
 
