@@ -1,3 +1,10 @@
+# Versión 2026.11.13 (2026-11-13)
+
+- Corrige el bloqueo de la pantalla OTP dentro del panel Ingress de Home Assistant.
+- Aplica la correccion tambien a la configuracion OTP, conservando la proteccion del acceso HTTPS directo.
+- Imagen privada validada y publicada para amd64 y aarch64.
+- No requiere cambios en la configuracion privada ni en la base de datos.
+
 # Versión 2026.11.12.1 (2026-11-12)
 
 - Activa Ingress con panel Domotica para administradores de Home Assistant.

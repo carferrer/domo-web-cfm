@@ -1,5 +1,5 @@
 name: "Domo WEB"
-version: "2026.11.12.1"
+version: "2026.11.13"
 # Migracion a imagen privada: requiere credenciales y revision manual.
 breaking_versions:
   - "2026.11.12"
