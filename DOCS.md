@@ -2,7 +2,7 @@
 
 Este repositorio es el catalogo publico del add-on. No contiene la aplicacion PHP
 ni credenciales. Home Assistant descarga la imagen privada ya construida:
-`ghcr.io/carferrer/domotica-php-cfm:2026.11.13.4`.
+`ghcr.io/carferrer/domotica-php-cfm:2026.11.13.5`.
 
 Se conserva el slug `domo-web-cfm`, la URL de este repositorio, el puerto interno
 460, los montajes addon_config y ssl y las opciones existentes. Actualizar el
@@ -30,7 +30,7 @@ La version 2026.11.12 figura en breaking_versions para exigir actualizacion manu
 ## Actualizar y comprobar
 
 1. Refrescar las actualizaciones de la tienda sin cambiar la URL del repositorio.
-2. Comprobar que Domo WEB ofrece 2026.11.13.4 y actualizar el add-on existente.
+2. Comprobar que Domo WEB ofrece 2026.11.13.5 y actualizar el add-on existente.
 3. Iniciar y revisar sus registros: la configuracion y las reglas deben prepararse
    antes de que Apache abra el puerto.
 4. Probar login, OTP, cierre de sesion, una consulta web, MSSQL API, UniFi y un
