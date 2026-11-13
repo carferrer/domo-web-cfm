@@ -2,7 +2,7 @@
 
 Este repositorio es el catalogo publico del add-on. No contiene la aplicacion PHP
 ni credenciales. Home Assistant descarga la imagen privada ya construida:
-`ghcr.io/carferrer/domotica-php-cfm:2026.11.13`.
+`ghcr.io/carferrer/domotica-php-cfm:2026.11.13.1`.
 
 Se conserva el slug `domo-web-cfm`, la URL de este repositorio, el puerto interno
 460, los montajes addon_config y ssl y las opciones existentes. Actualizar el
@@ -30,7 +30,7 @@ La version 2026.11.12 figura en breaking_versions para exigir actualizacion manu
 ## Actualizar y comprobar
 
 1. Refrescar las actualizaciones de la tienda sin cambiar la URL del repositorio.
-2. Comprobar que Domo WEB ofrece 2026.11.13 y actualizar el add-on existente.
+2. Comprobar que Domo WEB ofrece 2026.11.13.1 y actualizar el add-on existente.
 3. Iniciar y revisar sus registros: la configuracion y las reglas deben prepararse
    antes de que Apache abra el puerto.
 4. Probar login, OTP, cierre de sesion, una consulta web, MSSQL API, UniFi y un
@@ -42,6 +42,12 @@ El PHP se ejecuta desde `/opt/domo/html`, incluido en la imagen. El PHP de
 se distribuyen mediante una nueva imagen, no copiando PHP al antiguo html.
 
 ## Acceso Ingress y HTTPS directo
+
+La version 2026.11.13.1 corrige el regreso al inicio despues de enviar comandos
+por Ingress. Los formularios conservan la pagina de origen y sus filtros, tambien
+con varias pestanas abiertas. Despues de actualizar, recargar las paginas abiertas
+para recibir los formularios nuevos. Probar un comando desde Luces (con filtro),
+otra pantalla y el acceso HTTPS habitual.
 
 La version 2026.11.13 corrige el rechazo de conexion al llegar a la pantalla OTP
 por Ingress. Actualizar el complemento existente; no es necesario cambiar la
